@@ -1,0 +1,27 @@
+version: "3.7"
+
+services:
+
+  mysql-exchange:
+    image: mysql:5.7
+    command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci', '--sql_mode=']
+    volumes:
+      - ./database/init_exchange_db.sql:/init_exchange_db.sql:ro
+      - ./database/persistence:/var/lib/mysql:rw
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+    ports:
+      - target: 3306
+        published: ${DB_PORT}
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    environment:
+      PMA_HOSTS: mysql-exchange
+    ports:
+      - ${PORT_PMA}:80
+    depends_on:
+      - mysql-exchange
